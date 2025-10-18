@@ -61,8 +61,6 @@
               cargo-edit
               cargo-watch
               rust-analyzer
-
-              mini-redis
             ];
 
             env = {
