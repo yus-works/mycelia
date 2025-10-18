@@ -1,5 +1,10 @@
 use actix_files::Files;
-use actix_web::{App, HttpServer, middleware::Logger};
+use actix_web::{get, middleware::Logger, web, App, HttpServer, Responder};
+
+#[get("/hello")]
+async fn greet() -> impl Responder {
+    format!("Hello!")
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -9,6 +14,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
+            .service(greet)
             .service(Files::new("/pages", "static/pages/").show_files_listing())
             .service(Files::new("/", "static/").index_file("index.html"))
             .wrap(Logger::default())
