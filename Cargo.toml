@@ -11,3 +11,7 @@ tokio = { version = "1", features = ["full"] }
 mini-redis = "0.4"
 bytes = "1"
 reqwest = { version = "0.12.24", features = ["json", "rustls-tls"], default-features = false }
+tracing = "0.1.41"
+tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
+anyhow = "1.0.100"
+tracing-appender = "0.2.3"
