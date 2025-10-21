@@ -15,3 +15,4 @@ tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.20", features = ["env-filter"] }
 anyhow = "1.0.100"
 tracing-appender = "0.2.3"
+scraper = "0.24.0"
