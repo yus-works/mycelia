@@ -418,6 +418,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "bloomfilter"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f6d7f06817e48ea4e17532fa61bc4e8b9a101437f0623f69d2ea54284f3a817"
+dependencies = [
+ "getrandom 0.2.16",
+ "siphasher",
+]
+
+[[package]]
 name = "brotli"
 version = "8.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1454,6 +1464,7 @@ name = "mycelia"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bloomfilter",
  "bytes",
  "mini-redis",
  "regex",
