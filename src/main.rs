@@ -4,6 +4,7 @@ use scraper::{Html, Selector};
 use tracing::{error, info, instrument};
 
 mod log;
+mod graph;
 
 #[tokio::main]
 async fn main() -> Result<()> {
