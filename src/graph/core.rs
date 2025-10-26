@@ -5,6 +5,8 @@ use std::{
 
 use anyhow::anyhow;
 
+// NOTE: Tokio's RwLock might be marginally better but idk
+
 #[derive(Debug)]
 pub struct Graph {
     root: Arc<Node>,
