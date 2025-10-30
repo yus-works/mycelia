@@ -5,6 +5,7 @@ use tracing::{error, info, instrument};
 
 mod log;
 mod graph;
+mod visualizer;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -12,10 +13,12 @@ async fn main() -> Result<()> {
 
     info!("Starting application");
 
-    if let Err(e) = run().await {
-        error!("Fatal error: {:?}", e);
-        return Err(e);
-    }
+    visualizer::server::start().await?;
+
+    // if let Err(e) = run().await {
+    //     error!("Fatal error: {:?}", e);
+    //     return Err(e);
+    // }
 
     info!("Shutting down gracefully");
     Ok(())
