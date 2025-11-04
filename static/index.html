@@ -131,7 +131,7 @@
                 .attr("r", 8)
                 .attr("fill", d => d.id === "root" ? "#ff6b6b" : "#4ecdc4")
                 .call(drag(simulation));
-            
+
             nodeSelection = nodeEnter.merge(nodeSelection);
 
             // Update labels
@@ -143,7 +143,7 @@
                 .attr("dx", 12)
                 .attr("dy", 4)
                 .text(d => d.id.replace(/_/g, ' ').substring(0, 20));
-            
+
             labelSelection = labelEnter.merge(labelSelection);
 
             // Update simulation
@@ -207,7 +207,7 @@
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            
+
             if (data.type === "NodeAdded") {
                 if (!nodeMap.has(data.id)) {
                     const node = { id: data.id };
@@ -218,7 +218,7 @@
             } else if (data.type === "EdgeAdded") {
                 const sourceNode = nodeMap.get(data.source);
                 const targetNode = nodeMap.get(data.target);
-                
+
                 if (sourceNode && targetNode) {
                     graphData.links.push({
                         source: sourceNode,
