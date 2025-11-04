@@ -40,7 +40,7 @@ pub async fn start() -> anyhow::Result<()> {
     HttpServer::new(|| {
         App::new()
             .wrap(Logger::default())
-            .route("/ws/", web::get().to(ws_index))
+            .route("/ws", web::get().to(ws_index))
             .service(Files::new("/", "static/").index_file("index.html"))
     })
     .bind(("127.0.0.1", 8081))?
