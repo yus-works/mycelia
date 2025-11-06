@@ -5,6 +5,7 @@ use std::{
 
 use anyhow::anyhow;
 use tokio::sync::mpsc;
+use tracing::warn;
 
 pub enum GraphEvent {
     NodeAdded(String),
@@ -60,11 +61,14 @@ impl Graph {
 
         let (tx, rx) = mpsc::unbounded_channel();
 
-        (Graph {
-            nodes: RwLock::new(map),
-            root: root,
-            events_tx: Some(tx),
-        }, rx)
+        (
+            Graph {
+                nodes: RwLock::new(map),
+                root: root,
+                events_tx: Some(tx),
+            },
+            rx,
+        )
     }
 
     pub fn get_root(&self) -> Arc<Node> {
@@ -109,7 +113,11 @@ impl Graph {
                     None => false,
                 }
             }) {
-                return Err(anyhow!("Edge already exists"));
+                warn!(
+                    "Edge ({} -> {}) already exists",
+                    parent_content, child_content
+                );
+                return Ok(());
             }
 
             children.push(Arc::downgrade(&child));
@@ -142,10 +150,9 @@ impl Graph {
 
         if is_new {
             if let Some(tx) = &self.events_tx {
-                tx.send(GraphEvent::NodeAdded(content.to_owned()))
-                .map_err(|e| {
-                    anyhow!("Failed to send NodeAdded event: {}", e)
-                })?;
+                tx.send(GraphEvent::NodeAdded(content.to_owned())).map_err(
+                    |e| anyhow!("Failed to send NodeAdded event: {}", e),
+                )?;
             }
         }
 
