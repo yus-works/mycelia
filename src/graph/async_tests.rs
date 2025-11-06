@@ -6,7 +6,7 @@ use crate::graph::core::Graph;
 
 #[test]
 fn test_concurrent_add_edges_no_conflicts() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 10;
     let mut handles = vec![];
 
@@ -32,7 +32,7 @@ fn test_concurrent_add_edges_no_conflicts() {
 
 #[test]
 fn test_concurrent_add_same_edge_duplicate_detection() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 20;
     let barrier = Arc::new(Barrier::new(num_threads));
     let mut handles = vec![];
@@ -80,7 +80,7 @@ fn test_concurrent_add_same_edge_duplicate_detection() {
 
 #[test]
 fn test_concurrent_read_write_operations() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_writers = 5;
     let num_readers = 10;
     let mut handles = vec![];
@@ -126,7 +126,7 @@ fn test_concurrent_read_write_operations() {
 
 #[test]
 fn test_concurrent_nested_graph_construction() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_chains = 8;
     let chain_length = 10;
     let mut handles = vec![];
@@ -157,7 +157,7 @@ fn test_concurrent_nested_graph_construction() {
 
 #[test]
 fn test_concurrent_dag_construction() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let barrier = Arc::new(Barrier::new(4));
     let mut handles = vec![];
 
@@ -223,7 +223,7 @@ fn test_concurrent_dag_construction() {
 
 #[test]
 fn test_concurrent_traversal_during_modification() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let barrier = Arc::new(Barrier::new(3));
     let mut handles = vec![];
 
@@ -279,7 +279,7 @@ fn test_concurrent_traversal_during_modification() {
 
 #[test]
 fn test_concurrent_stress_test() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 20;
     let operations_per_thread = 100;
     let mut handles = vec![];
@@ -332,7 +332,7 @@ fn test_concurrent_stress_test() {
 
 #[test]
 fn test_concurrent_self_loop_creation() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 10;
     let barrier = Arc::new(Barrier::new(num_threads));
     let mut handles = vec![];
@@ -366,7 +366,7 @@ fn test_concurrent_self_loop_creation() {
 
 #[test]
 fn test_concurrent_cycle_creation() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
 
     // setup: root -> A -> B
     graph.add_edge("root", "A").unwrap();
@@ -412,7 +412,7 @@ fn test_concurrent_cycle_creation() {
 
 #[test]
 fn test_concurrent_get_or_create_node() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 50;
     let barrier = Arc::new(Barrier::new(num_threads));
     let mut handles = vec![];
@@ -449,7 +449,7 @@ fn test_concurrent_get_or_create_node() {
 
 #[test]
 fn test_no_deadlock_with_nested_locks() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 10;
     let mut handles = vec![];
 
@@ -486,7 +486,7 @@ fn test_no_deadlock_with_nested_locks() {
 
 #[test]
 fn test_concurrent_node_count_consistency() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_writers = 5;
     let num_readers = 10;
     let barrier = Arc::new(Barrier::new(num_writers + num_readers));
@@ -539,7 +539,7 @@ fn test_concurrent_node_count_consistency() {
 
 #[test]
 fn test_concurrent_contains_get_node_consistency() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let barrier = Arc::new(Barrier::new(2));
 
     // writer

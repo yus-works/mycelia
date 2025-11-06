@@ -20,8 +20,7 @@ pub struct Graph {
     pub(crate) nodes: RwLock<HashMap<String, Arc<Node>>>,
     // TODO: add bloomfilter back in when doing distributed
     // filter: RwLock<Bloom<String>>
-    events_rx: tokio::sync::mpsc::UnboundedReceiver<GraphEvent>,
-    events_tx: tokio::sync::mpsc::UnboundedSender<GraphEvent>,
+    events_tx: Option<tokio::sync::mpsc::UnboundedSender<GraphEvent>>,
 }
 
 #[derive(Debug)]
@@ -54,19 +53,18 @@ impl Node {
 }
 
 impl Graph {
-    pub fn new() -> Graph {
+    pub fn new() -> (Graph, mpsc::UnboundedReceiver<GraphEvent>) {
         let root = Arc::new(Node::new("root"));
         let mut map = HashMap::new();
         map.insert(String::from("root"), root.clone());
 
         let (tx, rx) = mpsc::unbounded_channel();
 
-        Graph {
+        (Graph {
             nodes: RwLock::new(map),
             root: root,
-            events_rx: rx,
-            events_tx: tx,
-        }
+            events_tx: Some(tx),
+        }, rx)
     }
 
     pub fn get_root(&self) -> Arc<Node> {
@@ -117,12 +115,13 @@ impl Graph {
             children.push(Arc::downgrade(&child));
         } // scoped to drop lock before channel stuff
 
-        self.events_tx
-            .send(GraphEvent::EdgeAdded(
+        if let Some(tx) = &self.events_tx {
+            tx.send(GraphEvent::EdgeAdded(
                 parent_content.to_owned(),
                 child_content.to_owned(),
             ))
             .map_err(|e| anyhow!("Event dropped: {}", e))?;
+        }
 
         Ok(())
     }
@@ -142,13 +141,29 @@ impl Graph {
         };
 
         if is_new {
-            self.events_tx
-                .send(GraphEvent::NodeAdded(content.to_owned()))
+            if let Some(tx) = &self.events_tx {
+                tx.send(GraphEvent::NodeAdded(content.to_owned()))
                 .map_err(|e| {
                     anyhow!("Failed to send NodeAdded event: {}", e)
                 })?;
+            }
         }
 
         Ok(node)
+    }
+}
+
+#[cfg(test)]
+impl Graph {
+    pub fn new_without_events() -> Graph {
+        let root = Arc::new(Node::new("root"));
+        let mut map = HashMap::new();
+        map.insert(String::from("root"), root.clone());
+
+        Graph {
+            nodes: RwLock::new(map),
+            root: root,
+            events_tx: None,
+        }
     }
 }

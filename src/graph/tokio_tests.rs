@@ -7,7 +7,7 @@ use crate::graph::core::Graph;
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_massive_concurrent_edge_addition() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_tasks = 1000;
     let mut handles = vec![];
 
@@ -31,7 +31,7 @@ async fn test_massive_concurrent_edge_addition() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_heavy_duplicate_contention() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_tasks = 5000;
     let mut handles = vec![];
 
@@ -59,7 +59,7 @@ async fn test_heavy_duplicate_contention() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_large_scale_dag_construction() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let layers = 5;
     let nodes_per_layer = 50;
     let mut handles = vec![];
@@ -97,7 +97,7 @@ async fn test_large_scale_dag_construction() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_mixed_async_workload() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_writers = 100;
     let num_readers = 500;
     let mut handles = vec![];
@@ -139,7 +139,7 @@ async fn test_mixed_async_workload() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_query_storm() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
 
     // setup: Add some nodes
     for i in 0..100 {
@@ -172,7 +172,7 @@ async fn test_query_storm() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_concurrent_traversals() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
 
     // build a tree
     for i in 0..10 {
@@ -214,7 +214,7 @@ async fn test_concurrent_traversals() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_operations_complete_in_time() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_tasks = 1000;
 
     let timeout = Duration::from_secs(5);
@@ -247,7 +247,7 @@ async fn test_operations_complete_in_time() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_spawn_blocking_integration() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_tasks = 100;
     let mut handles = vec![];
 
@@ -272,7 +272,7 @@ async fn test_spawn_blocking_integration() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_cancellation_safety() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let mut handles = vec![];
 
     // spawn many tasks, some of which we'll cancel
@@ -315,7 +315,7 @@ async fn test_cancellation_safety() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_concurrent_self_loop_tokio() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_tasks = 1000;
     let mut handles = vec![];
 
@@ -342,7 +342,7 @@ async fn test_concurrent_self_loop_tokio() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_async_cycle_creation() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
 
     // setup initial chain
     graph.add_edge("root", "A").unwrap();
@@ -400,7 +400,7 @@ async fn test_async_cycle_creation() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 8)]
 async fn test_node_count_monotonic_async() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let mut handles = vec![];
 
     // writers

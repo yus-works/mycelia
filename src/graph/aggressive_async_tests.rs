@@ -7,7 +7,7 @@ use crate::graph::core::Graph;
 
 #[test]
 fn test_aggressive_duplicate_edge_hammering() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 100;
     let mut handles = vec![];
 
@@ -42,7 +42,7 @@ fn test_aggressive_duplicate_edge_hammering() {
 
 #[test]
 fn test_interleaved_get_or_create() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 50;
     let barrier = Arc::new(Barrier::new(num_threads));
     let mut handles = vec![];
@@ -104,7 +104,7 @@ fn test_interleaved_get_or_create() {
 
 #[test]
 fn test_rapid_add_and_read_same_parent() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 20;
     let mut handles = vec![];
 
@@ -147,7 +147,7 @@ fn test_rapid_add_and_read_same_parent() {
 
 #[test]
 fn test_complex_dag_concurrent_construction() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_threads = 10;
     let barrier = Arc::new(Barrier::new(num_threads));
     let mut handles = vec![];
@@ -190,7 +190,7 @@ fn test_complex_dag_concurrent_construction() {
 
 #[test]
 fn test_weak_reference_upgrade_under_contention() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
 
     // create a parent with many children
     for i in 0..100 {
@@ -231,7 +231,7 @@ fn test_weak_reference_upgrade_under_contention() {
 
 #[test]
 fn test_concurrent_modification_different_subtrees() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
 
     // setup: Create initial structure
     for i in 0..10 {
@@ -275,7 +275,7 @@ fn test_concurrent_modification_different_subtrees() {
 
 #[test]
 fn test_simultaneous_cycle_creation() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
 
     // setup: A -> B -> C -> D
     graph.add_edge("root", "A").unwrap();
@@ -354,7 +354,7 @@ fn test_simultaneous_cycle_creation() {
 
 #[test]
 fn test_no_phantom_duplicates() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let num_iterations = 100;
 
     for iteration in 0..num_iterations {
@@ -400,7 +400,7 @@ fn test_no_phantom_duplicates() {
 
 #[test]
 fn test_timing_sensitive_operations() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
     let barrier = Arc::new(Barrier::new(3));
     let mut handles = vec![];
 
@@ -451,7 +451,7 @@ fn test_timing_sensitive_operations() {
 
 #[test]
 fn test_reference_counting_integrity() {
-    let graph = Arc::new(Graph::new());
+    let graph = Arc::new(Graph::new_without_events());
 
     // add nodes
     for i in 0..50 {

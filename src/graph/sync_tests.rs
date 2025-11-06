@@ -5,7 +5,7 @@ use crate::graph::core::{Graph, Node};
 
 #[test]
 fn test_create_graph() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     assert_eq!(graph.get_root().get_data(), "root");
     assert_eq!(graph.nodes.read().unwrap().len(), 1);
@@ -13,13 +13,13 @@ fn test_create_graph() {
 
 #[test]
 fn test_root_has_no_children_initially() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     assert_eq!(graph.get_root().get_children().len(), 0);
 }
 
 #[test]
 fn test_add_edge_single_child() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     graph.add_edge("root", "child").unwrap();
 
@@ -32,7 +32,7 @@ fn test_add_edge_single_child() {
 
 #[test]
 fn test_add_edge_multiple_children() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     graph.add_edge("root", "child1").unwrap();
     graph.add_edge("root", "child2").unwrap();
@@ -44,20 +44,20 @@ fn test_add_edge_multiple_children() {
 
 #[test]
 fn test_empty_string_as_data() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     assert!(graph.add_edge("root", "").is_ok());
     assert!(graph.contains(""));
 }
 
 #[test]
 fn test_special_characters_in_data() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     assert!(graph.add_edge("root", "node/with\\special$chars").is_ok());
 }
 
 #[test]
 fn test_disconnected_nodes() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     graph.add_edge("A", "B").unwrap(); // not connected to root
     assert_eq!(graph.node_count(), 3); // root, A, B
     assert!(graph.get_node("A").is_some());
@@ -65,7 +65,7 @@ fn test_disconnected_nodes() {
 
 #[test]
 fn test_nested_graph() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     graph.add_edge("root", "child").unwrap();
     graph.add_edge("child", "grandchild").unwrap();
@@ -81,7 +81,7 @@ fn test_nested_graph() {
 
 #[test]
 fn test_graph_traversal() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     graph.add_edge("root", "child1").unwrap();
     graph.add_edge("root", "child2").unwrap();
@@ -107,7 +107,7 @@ fn test_graph_traversal() {
 
 #[test]
 fn test_same_child_multiple_parents_allowed() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     // add both parents to graph
     graph.add_edge("root", "parent1").unwrap();
@@ -136,7 +136,7 @@ fn test_same_child_multiple_parents_allowed() {
 
 #[test]
 fn test_duplicate_children_rejected() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     let res1 = graph.add_edge("root", "child");
     let res2 = graph.add_edge("root", "child");
@@ -156,7 +156,7 @@ fn test_duplicate_children_rejected() {
 
 #[test]
 fn test_get_node() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     assert!(graph.add_edge("root", "A").is_ok());
     assert!(graph.add_edge("root", "B").is_ok());
@@ -170,7 +170,7 @@ fn test_get_node() {
 
 #[test]
 fn test_cycle_doesnt_leak_with_weak_refs() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     graph.add_edge("root", "A").unwrap();
     graph.add_edge("A", "B").unwrap();
     graph.add_edge("B", "A").unwrap(); // cycle
@@ -184,7 +184,7 @@ fn test_cycle_doesnt_leak_with_weak_refs() {
 // but this verifies logic i guess
 #[test]
 fn test_dead_weak_refs_filtered_out() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     graph.add_edge("root", "child").unwrap();
 
     let child_arc = graph.get_node("child").unwrap();
@@ -200,7 +200,7 @@ fn test_dead_weak_refs_filtered_out() {
 
 #[test]
 fn test_get_children_creates_temporary_ownership() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     graph.add_edge("root", "A").unwrap();
     graph.add_edge("A", "B").unwrap();
 
@@ -226,7 +226,7 @@ fn test_get_children_creates_temporary_ownership() {
 
 #[test]
 fn test_self_loop_allowed() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
 
     assert!(
         graph.add_edge("root", "root").is_ok(),
@@ -242,7 +242,7 @@ fn test_self_loop_allowed() {
 
 #[test]
 fn test_traversal_visits_each_node_once() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     graph.add_edge("root", "left").unwrap();
     graph.add_edge("root", "right").unwrap();
     graph.add_edge("left", "shared").unwrap();
@@ -281,7 +281,7 @@ fn test_traversal_visits_each_node_once() {
 
 #[test]
 fn test_graph_query_methods() {
-    let graph = Graph::new();
+    let graph = Graph::new_without_events();
     graph.add_edge("root", "child").unwrap();
 
     assert!(graph.contains("root"));
