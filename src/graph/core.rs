@@ -1,9 +1,15 @@
 use std::{
-    collections::HashMap,
+    collections::{HashMap, hash_map::Entry},
     sync::{Arc, RwLock, Weak},
 };
 
 use anyhow::anyhow;
+use tokio::sync::mpsc;
+
+pub enum GraphEvent {
+    NodeAdded(String),
+    EdgeAdded(String, String),
+}
 
 // NOTE: Tokio's RwLock might be marginally better but idk
 
@@ -14,6 +20,8 @@ pub struct Graph {
     pub(crate) nodes: RwLock<HashMap<String, Arc<Node>>>,
     // TODO: add bloomfilter back in when doing distributed
     // filter: RwLock<Bloom<String>>
+    events_rx: tokio::sync::mpsc::UnboundedReceiver<GraphEvent>,
+    events_tx: tokio::sync::mpsc::UnboundedSender<GraphEvent>,
 }
 
 #[derive(Debug)]
@@ -51,9 +59,13 @@ impl Graph {
         let mut map = HashMap::new();
         map.insert(String::from("root"), root.clone());
 
+        let (tx, rx) = mpsc::unbounded_channel();
+
         Graph {
             nodes: RwLock::new(map),
             root: root,
+            events_rx: rx,
+            events_tx: tx,
         }
     }
 
@@ -86,30 +98,57 @@ impl Graph {
         let parent = self.get_or_create_node(parent_content)?;
         let child = self.get_or_create_node(child_content)?;
 
-        // check duplicate edge using ptr_eq
-        let mut children = parent.children.write().unwrap();
+        {
+            // check duplicate edge using ptr_eq
+            let mut children = parent.children.write().unwrap();
 
-        if children.iter().any(|c| {
-            match c.upgrade() {
-                // compare if node exists
-                Some(arc) => Arc::ptr_eq(&arc, &child),
+            if children.iter().any(|c| {
+                match c.upgrade() {
+                    // compare if node exists
+                    Some(arc) => Arc::ptr_eq(&arc, &child),
 
-                // node doesn't exist anymore
-                None => false,
+                    // node doesn't exist anymore
+                    None => false,
+                }
+            }) {
+                return Err(anyhow!("Edge already exists"));
             }
-        }) {
-            return Err(anyhow!("Edge already exists"));
-        }
 
-        children.push(Arc::downgrade(&child));
+            children.push(Arc::downgrade(&child));
+        } // scoped to drop lock before channel stuff
+
+        self.events_tx
+            .send(GraphEvent::EdgeAdded(
+                parent_content.to_owned(),
+                child_content.to_owned(),
+            ))
+            .map_err(|e| anyhow!("Event dropped: {}", e))?;
+
         Ok(())
     }
 
     fn get_or_create_node(&self, content: &str) -> anyhow::Result<Arc<Node>> {
-        let mut nodes = self.nodes.write().unwrap();
-        Ok(nodes
-            .entry(content.to_owned())
-            .or_insert_with(|| Arc::new(Node::new(content)))
-            .clone())
+        let (node, is_new) = {
+            let mut nodes = self.nodes.write().unwrap();
+
+            match nodes.entry(content.to_owned()) {
+                Entry::Vacant(e) => {
+                    let node = Arc::new(Node::new(content));
+                    e.insert(node.clone());
+                    (node, true)
+                }
+                Entry::Occupied(e) => (e.get().clone(), false),
+            }
+        };
+
+        if is_new {
+            self.events_tx
+                .send(GraphEvent::NodeAdded(content.to_owned()))
+                .map_err(|e| {
+                    anyhow!("Failed to send NodeAdded event: {}", e)
+                })?;
+        }
+
+        Ok(node)
     }
 }
