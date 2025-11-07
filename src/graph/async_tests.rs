@@ -54,9 +54,8 @@ fn test_concurrent_add_same_edge_duplicate_detection() {
 
     for handle in handles {
         match handle.join().unwrap() {
-            Ok(_) => success_count += 1,
-            Err(e) => {
-                assert!(e.to_string().contains("Edge already exists"));
+            Ok(true) => success_count += 1,
+            _ => {
                 error_count += 1;
             }
         }
@@ -353,8 +352,8 @@ fn test_concurrent_self_loop_creation() {
 
     for handle in handles {
         match handle.join().unwrap() {
-            Ok(_) => success_count += 1,
-            Err(_) => error_count += 1,
+            Ok(true) => success_count += 1,
+            _ => error_count += 1,
         }
     }
 
@@ -439,7 +438,8 @@ fn test_concurrent_get_or_create_node() {
     }
 
     // only 3 edges should succeed (one per unique target)
-    let success_count = results.iter().filter(|r| r.is_ok()).count();
+    let success_count =
+        results.iter().filter(|r| matches!(r, Ok(true))).count();
     assert_eq!(success_count, target_nodes.len());
 
     // verify only the target nodes were created

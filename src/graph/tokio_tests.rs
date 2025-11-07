@@ -44,12 +44,12 @@ async fn test_heavy_duplicate_contention() {
 
     let mut results = Vec::new();
     for handle in handles {
-        results.push(handle.await);
+        results.push(handle.await.unwrap());
     }
 
     let successes = results
         .iter()
-        .filter(|r| r.as_ref().unwrap().is_ok())
+        .filter(|r| matches!(r, Ok(true)))
         .count();
 
     assert_eq!(successes, 1, "Only one task should succeed");
@@ -328,12 +328,12 @@ async fn test_concurrent_self_loop_tokio() {
 
     let mut results = Vec::new();
     for handle in handles {
-        results.push(handle.await);
+        results.push(handle.await.unwrap());
     }
 
     let successes = results
         .iter()
-        .filter(|r| r.as_ref().unwrap().is_ok())
+        .filter(|r| matches!(r, Ok(true)))
         .count();
 
     assert_eq!(successes, 1, "Only one self-loop should succeed");

@@ -191,7 +191,11 @@ async fn test_no_events_on_failed_edge() {
 
     // Try to add duplicate (should fail)
     let result = graph.add_edge("root", "child");
-    assert!(result.is_err());
+    assert!(match result {
+        Ok(false) => true,
+        Err(_) => true,
+        Ok(true) => false,
+    });
 
     let events = collect_events(&mut rx, 10, Duration::from_millis(100)).await;
 

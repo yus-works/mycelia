@@ -3,6 +3,8 @@ use std::sync::{Arc, Barrier};
 use std::thread;
 use std::time::Duration;
 
+use tracing::warn;
+
 use crate::graph::core::Graph;
 
 #[test]
@@ -381,7 +383,8 @@ fn test_no_phantom_duplicates() {
         let results: Vec<_> =
             handles.into_iter().map(|h| h.join().unwrap()).collect();
 
-        let successes = results.iter().filter(|r| r.is_ok()).count();
+        let successes =
+            results.iter().filter(|r| matches!(r, Ok(true))).count();
         assert_eq!(
             successes, 1,
             "Iteration {}: Expected exactly 1 success, got {}",

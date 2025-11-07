@@ -141,14 +141,8 @@ fn test_duplicate_children_rejected() {
     let res1 = graph.add_edge("root", "child");
     let res2 = graph.add_edge("root", "child");
 
-    assert!(res1.is_ok(), "Should succeed in adding first edge");
-    assert!(res2.is_err(), "Should reject duplicate edge");
-
-    assert!(
-        res2.unwrap_err()
-            .to_string()
-            .contains("Edge already exists")
-    );
+    assert!(matches!(res1, Ok(true)), "Should succeed in adding first edge");
+    assert!(matches!(res2, Ok(false)), "Should reject duplicate edge");
 
     let root = graph.get_node("root").expect("Root should exist in graph");
     assert_eq!(root.get_children().len(), 1);
