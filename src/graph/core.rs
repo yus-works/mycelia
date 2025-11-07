@@ -91,11 +91,14 @@ impl Graph {
     }
 
     // TODO: disjointed graphs allowed for now
+    /// Returns Ok(true) if edge was added
+    /// Returns Ok(false) if edge already exists
+    /// Returns Err(...) for actual errors
     pub fn add_edge(
         &self,
         parent_content: &str,
         child_content: &str,
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<bool> {
         // get canonical nodes (creates if needed, returns existing if present)
         let parent = self.get_or_create_node(parent_content)?;
         let child = self.get_or_create_node(child_content)?;
@@ -117,7 +120,7 @@ impl Graph {
                     "Edge ({} -> {}) already exists",
                     parent_content, child_content
                 );
-                return Ok(());
+                return Ok(false);
             }
 
             children.push(Arc::downgrade(&child));
@@ -131,7 +134,7 @@ impl Graph {
             .map_err(|e| anyhow!("Event dropped: {}", e))?;
         }
 
-        Ok(())
+        Ok(true)
     }
 
     fn get_or_create_node(&self, content: &str) -> anyhow::Result<Arc<Node>> {
